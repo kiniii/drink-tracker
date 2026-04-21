@@ -1,50 +1,42 @@
-# Welcome to your Expo app 👋
+**Drink Tracker**
+A lightweight mobile app that helps track drinks during a night out, focusing on fast interaction, low friction logging, and safe actions.
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Built as a side project to explore mobile development with React Native (Expo) and TypeScript, with a strong focus on interaction design and UX safety.
 
-## Get started
 
-1. Install dependencies
+**Purpose of the project**
+This project is mainly educational and explores:
 
-   ```bash
-   npm install
-   ```
+- Mobile app development using React Native + Expo + TypeScript
+- Designing fast, low-friction user interactions
+- Building safe state transitions with undoable actions
+- Managing temporary vs committed state in real-world UX flows
 
-2. Start the app
+This project is not about feature completeness, but about exploring how small interaction decisions shape user behavior in real-world mobile contexts.
 
-   ```bash
-   npx expo start
-   ```
 
-In the output, you'll find options to open the app in a
+**Key UX focus**
+Instead of treating this as a simple tracker, the project focuses on:
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- Preventing accidental destructive actions
+- Designing reversible actions using an undo window
+- Prioritising one-handed, low-attention interaction patterns
+- Clear hierarchy between primary, secondary, and destructive actions
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
+**Core features**
+- Log drinks instantly (beer, wine, cocktail, shot)
+- Active “session” tracking
+- Undo last drink
+- End session with undoable confirmation flow
+- Session history with basic statistics
+- Persistent storage using AsyncStorage
 
-When you're ready, run:
 
-```bash
-npm run reset-project
-```
+**Session model**
+The app introduces a simple session lifecycle:
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- Active session → drinks are logged in real time
+- End session → moves into a temporary state
+- Undo window → allows reversal before final commit
+- History → permanently stored sessions
