@@ -1,10 +1,12 @@
 **Drink Tracker**
+
 A lightweight mobile app that helps track drinks during a night out, focusing on fast interaction, low friction logging, and safe actions.
 
 Built as a side project to explore mobile development with React Native (Expo) and TypeScript, with a strong focus on interaction design and UX safety.
 
 
 **Purpose of the project**
+
 This project is mainly educational and explores:
 
 - Mobile app development using React Native + Expo + TypeScript
@@ -16,6 +18,7 @@ This project is not about feature completeness, but about exploring how small in
 
 
 **Key UX focus**
+
 Instead of treating this as a simple tracker, the project focuses on:
 
 - Preventing accidental destructive actions
@@ -25,6 +28,7 @@ Instead of treating this as a simple tracker, the project focuses on:
 
 
 **Core features**
+
 - Log drinks instantly (beer, wine, cocktail, shot)
 - Active “session” tracking
 - Undo last drink
@@ -34,6 +38,7 @@ Instead of treating this as a simple tracker, the project focuses on:
 
 
 **Session model**
+
 The app introduces a simple session lifecycle:
 
 - Active session → drinks are logged in real time
