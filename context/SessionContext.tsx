@@ -19,10 +19,13 @@ export type Session = {
 type SessionContextType = {
   currentSession: Session | null;
   sessions: Session[];
+  pendingSession: Session | null; 
   isLoaded: boolean;
   logDrink: (type: DrinkType) => void;
   undoLastDrink: () => void;
   endSession: () => void;
+  commitPendingSession: () => void;
+  undoEndSession: () => void;
   clearHistory: () => void;
 };
 
@@ -45,6 +48,7 @@ function createId() {
 
 export function SessionProvider({ children }: SessionProviderProps) {
   const [currentSession, setCurrentSession] = useState<Session | null>(null);
+  const [pendingSession, setPendingSession] = useState<Session | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -132,21 +136,34 @@ export function SessionProvider({ children }: SessionProviderProps) {
 
   const endSession = () => {
     setCurrentSession((prev) => {
-      if (!prev) return null;
-
-      if (prev.drinks.length === 0) {
-        return null;
-      }
-
+      if (!prev || prev.drinks.length === 0) return null;
+  
       const endedSession: Session = {
         ...prev,
         endTime: Date.now(),
       };
-
-      setSessions((existingSessions) => [...existingSessions, endedSession]);
-
-      return null;
+  
+      setPendingSession(endedSession); // store temporarily
+      return null; // clear active session
     });
+  };
+
+  const commitPendingSession = () => {
+    if (!pendingSession) return;
+  
+    setSessions((prev) => [...prev, pendingSession]);
+    setPendingSession(null);
+  };
+
+  const undoEndSession = () => {
+    if (!pendingSession) return;
+  
+    setCurrentSession({
+      ...pendingSession,
+      endTime: null,
+    });
+  
+    setPendingSession(null);
   };
 
   const clearHistory = () => {
@@ -158,6 +175,9 @@ export function SessionProvider({ children }: SessionProviderProps) {
       value={{
         currentSession,
         sessions,
+        pendingSession,
+        commitPendingSession,
+        undoEndSession,
         isLoaded,
         logDrink,
         undoLastDrink,

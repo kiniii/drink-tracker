@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo,useState } from "react";
 import {
   Alert,
   FlatList,
@@ -18,38 +18,59 @@ const DRINK_OPTIONS: { label: string; type: DrinkType }[] = [
 ];
 
 export default function TonightScreen() {
-  const { currentSession, logDrink, undoLastDrink, endSession, isLoaded } =
-    useSession();
+  const {
+    currentSession,
+    logDrink,
+    undoLastDrink,
+    endSession,
+    commitPendingSession,
+    undoEndSession,
+    isLoaded,
+  } = useSession();
 
   const drinks = useMemo(() => {
     if (!currentSession) return [];
     return [...currentSession.drinks].sort((a, b) => b.timestamp - a.timestamp);
   }, [currentSession]);
 
+  const [showToast, setShowToast] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
+  const [LastSessionDrinkCount, setLastSessionDrinkCount] = useState(0);
+
   const drinkCount = currentSession?.drinks.length ?? 0;
   const sessionMeta = currentSession
     ? `drinks logged • started ${formatTime(currentSession.startTime)}`
     : "No drinks logged yet";
 
-  function handleEndSession() {
-    if (drinkCount === 0) return;
+    function handleEndSession() {
+      if (drinkCount === 0) return;
+    
+      setLastSessionDrinkCount(drinkCount);
+      endSession();
+      showUndoToast();
+    }
 
-    Alert.alert(
-      "End session?",
-      "This will save tonight’s session to your history.",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "End session",
-          style: "destructive",
-          onPress: endSession,
-        },
-      ]
-    );
-  }
+    function showUndoToast() {
+      setShowToast(true);
+    
+      const id = setTimeout(() => {
+        commitPendingSession();
+        setShowToast(false);
+      }, 8000);
+    
+      setTimeoutId(id);
+    }
+
+    function handleUndoEndSession() {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    
+      undoEndSession();
+      setShowToast(false);
+    }
+
+
 
   if (!isLoaded) {
     return (
@@ -137,6 +158,17 @@ export default function TonightScreen() {
         }
         renderItem={({ item }) => <DrinkListItem item={item} />}
       />
+                  {showToast && (
+  <View style={styles.toast}>
+    <Text style={styles.toastText}>
+      Session saved ({LastSessionDrinkCount} drinks)
+    </Text>
+
+    <Pressable onPress={handleUndoEndSession}>
+      <Text style={styles.toastAction}>Undo</Text>
+    </Pressable>
+  </View>
+)}
     </SafeAreaView>
   );
 }
@@ -340,5 +372,29 @@ const styles = StyleSheet.create({
   drinkItemTime: {
     fontSize: 14,
     color: "#9ca3af",
+  },
+  toast: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: '#1f2937',
+    borderRadius: 14,
+    padding: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    elevation: 5, 
+  },
+  
+  toastText: {
+    color: '#f9fafb',
+    fontSize: 14,
+  },
+  
+  toastAction: {
+    color: '#a78bfa',
+    fontWeight: '700',
+    fontSize: 14,
   },
 });
