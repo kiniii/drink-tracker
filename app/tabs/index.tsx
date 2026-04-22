@@ -1,12 +1,5 @@
-import { useMemo,useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Drink, DrinkType, useSession } from "../../context/SessionContext";
 
@@ -34,7 +27,9 @@ export default function TonightScreen() {
   }, [currentSession]);
 
   const [showToast, setShowToast] = useState(false);
-  const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
+  const [timeoutId, setTimeoutId] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
   const [LastSessionDrinkCount, setLastSessionDrinkCount] = useState(0);
 
   const drinkCount = currentSession?.drinks.length ?? 0;
@@ -42,35 +37,41 @@ export default function TonightScreen() {
     ? `drinks logged • started ${formatTime(currentSession.startTime)}`
     : "No drinks logged yet";
 
-    function handleEndSession() {
-      if (drinkCount === 0) return;
-    
-      setLastSessionDrinkCount(drinkCount);
-      endSession();
-      showUndoToast();
-    }
+  function handleEndSession() {
+    if (drinkCount === 0) return;
 
-    function showUndoToast() {
-      setShowToast(true);
-    
-      const id = setTimeout(() => {
-        commitPendingSession();
-        setShowToast(false);
-      }, 8000);
-    
-      setTimeoutId(id);
-    }
+    setLastSessionDrinkCount(drinkCount);
+    endSession();
+    showUndoToast();
+  }
 
-    function handleUndoEndSession() {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    
-      undoEndSession();
+  function showUndoToast() {
+    setShowToast(true);
+
+    const id = setTimeout(() => {
+      commitPendingSession();
       setShowToast(false);
+    }, 6000);
+
+    setTimeoutId(id);
+  }
+
+  function handleUndoEndSession() {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
     }
 
+    undoEndSession();
+    setShowToast(false);
+  }
 
+  useEffect(() => {
+    return () => {
+      if (showToast) {
+        commitPendingSession();
+      }
+    };
+  }, [showToast]);
 
   if (!isLoaded) {
     return (
@@ -111,7 +112,6 @@ export default function TonightScreen() {
             </View>
 
             <View style={styles.heroCard}>
-              
               <Text style={styles.heroCount}>{drinkCount}</Text>
               <Text style={styles.heroMeta}>{sessionMeta}</Text>
             </View>
@@ -158,17 +158,17 @@ export default function TonightScreen() {
         }
         renderItem={({ item }) => <DrinkListItem item={item} />}
       />
-                  {showToast && (
-  <View style={styles.toast}>
-    <Text style={styles.toastText}>
-      Session saved ({LastSessionDrinkCount} drinks)
-    </Text>
+      {showToast && (
+        <View style={styles.toast}>
+          <Text style={styles.toastText}>
+            Session saved ({LastSessionDrinkCount} drinks)
+          </Text>
 
-    <Pressable onPress={handleUndoEndSession}>
-      <Text style={styles.toastAction}>Undo</Text>
-    </Pressable>
-  </View>
-)}
+          <Pressable onPress={handleUndoEndSession}>
+            <Text style={styles.toastAction}>Undo</Text>
+          </Pressable>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -374,27 +374,27 @@ const styles = StyleSheet.create({
     color: "#9ca3af",
   },
   toast: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 20,
     left: 20,
     right: 20,
-    backgroundColor: '#1f2937',
+    backgroundColor: "#1f2937",
     borderRadius: 14,
     padding: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    elevation: 5, 
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    elevation: 5,
   },
-  
+
   toastText: {
-    color: '#f9fafb',
+    color: "#f9fafb",
     fontSize: 14,
   },
-  
+
   toastAction: {
-    color: '#a78bfa',
-    fontWeight: '700',
+    color: "#a78bfa",
+    fontWeight: "700",
     fontSize: 14,
   },
 });

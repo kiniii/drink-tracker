@@ -1,7 +1,13 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 
-export type DrinkType = 'beer' | 'wine' | 'cocktail' | 'shot';
+export type DrinkType = "beer" | "wine" | "cocktail" | "shot";
 
 export type Drink = {
   id: string;
@@ -19,7 +25,7 @@ export type Session = {
 type SessionContextType = {
   currentSession: Session | null;
   sessions: Session[];
-  pendingSession: Session | null; 
+  pendingSession: Session | null;
   isLoaded: boolean;
   logDrink: (type: DrinkType) => void;
   undoLastDrink: () => void;
@@ -34,7 +40,7 @@ type StoredSessionState = {
   sessions: Session[];
 };
 
-const STORAGE_KEY = 'drink-tracker-state';
+const STORAGE_KEY = "drink-tracker-state";
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
@@ -63,7 +69,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
           setSessions(parsedState.sessions);
         }
       } catch (error) {
-        console.error('Failed to load session state:', error);
+        console.error("Failed to load session state:", error);
       } finally {
         setIsLoaded(true);
       }
@@ -84,7 +90,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
 
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
       } catch (error) {
-        console.error('Failed to save session state:', error);
+        console.error("Failed to save session state:", error);
       }
     }
 
@@ -137,12 +143,12 @@ export function SessionProvider({ children }: SessionProviderProps) {
   const endSession = () => {
     setCurrentSession((prev) => {
       if (!prev || prev.drinks.length === 0) return null;
-  
+
       const endedSession: Session = {
         ...prev,
         endTime: Date.now(),
       };
-  
+
       setPendingSession(endedSession); // store temporarily
       return null; // clear active session
     });
@@ -150,19 +156,19 @@ export function SessionProvider({ children }: SessionProviderProps) {
 
   const commitPendingSession = () => {
     if (!pendingSession) return;
-  
+
     setSessions((prev) => [...prev, pendingSession]);
     setPendingSession(null);
   };
 
   const undoEndSession = () => {
     if (!pendingSession) return;
-  
+
     setCurrentSession({
       ...pendingSession,
       endTime: null,
     });
-  
+
     setPendingSession(null);
   };
 
@@ -194,7 +200,7 @@ export function useSession() {
   const context = useContext(SessionContext);
 
   if (!context) {
-    throw new Error('useSession must be used within a SessionProvider');
+    throw new Error("useSession must be used within a SessionProvider");
   }
 
   return context;
