@@ -1,6 +1,6 @@
-# Drink Tracker
+# Who's Counting?
 
-A lightweight mobile app that helps track drinks during a night out, focusing on fast interaction, low-friction logging, and safe actions.
+"Who's Counting?" is a lightweight mobile app that helps track drinks during a night out, focusing on fast interaction, low-friction logging, and safe actions.
 
 Built as a side project to explore mobile development with React Native (Expo) and TypeScript, with a strong focus on interaction design and UX safety.
 
