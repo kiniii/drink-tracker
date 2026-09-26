@@ -8,7 +8,11 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { TrendChart } from "../../components/trend-chart";
 import { Session, useSession } from "../../context/SessionContext";
+import { getDailyDrinkCounts } from "../../utils/trends";
+
+const TREND_DAYS = 7;
 
 export default function HistoryScreen() {
   const { sessions, isLoaded, clearHistory } = useSession();
@@ -43,6 +47,11 @@ export default function HistoryScreen() {
       avgDrinksPerSession,
     };
   }, [sessions]);
+
+  const trendData = useMemo(
+    () => getDailyDrinkCounts(sessions, TREND_DAYS),
+    [sessions]
+  );
 
   function handleClearHistory() {
     if (sessions.length === 0) return;
@@ -110,6 +119,9 @@ export default function HistoryScreen() {
                 value={stats.avgDrinksPerSession.toFixed(1)}
               />
             </View>
+
+            <Text style={styles.sectionTitle}>Last {TREND_DAYS} days</Text>
+            <TrendChart data={trendData} />
           </>
         }
         ListEmptyComponent={
@@ -205,6 +217,12 @@ function SessionListItem({ session }: { session: Session }) {
           ~{Math.round(drinksPerHour)} drinks/hour
         </Text>
       )}
+
+      {session.note && (
+        <Text style={styles.sessionNote} numberOfLines={1}>
+          📍 {session.note}
+        </Text>
+      )}
     </View>
   );
 }
@@ -287,6 +305,12 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 28,
   },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#f9fafb",
+    marginBottom: 12,
+  },
   statCard: {
     flexBasis: "48%",
     flexGrow: 1,
@@ -354,5 +378,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#6b7280",
     marginTop: 4,
+  },
+  sessionNote: {
+    fontSize: 13,
+    color: "#9ca3af",
+    marginTop: 6,
   },
 });

@@ -20,6 +20,7 @@ export type Session = {
   startTime: number;
   endTime: number | null;
   drinks: Drink[];
+  note: string | null;
 };
 
 type SessionContextType = {
@@ -33,6 +34,7 @@ type SessionContextType = {
   commitPendingSession: () => void;
   undoEndSession: () => void;
   clearHistory: () => void;
+  setSessionNote: (note: string) => void;
 };
 
 type StoredSessionState = {
@@ -113,6 +115,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
           startTime: now,
           endTime: null,
           drinks: [newDrink],
+          note: null,
         };
       }
 
@@ -176,6 +179,19 @@ export function SessionProvider({ children }: SessionProviderProps) {
     setSessions([]);
   };
 
+  const setSessionNote = (note: string) => {
+    const trimmed = note.trim();
+
+    setCurrentSession((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        note: trimmed.length > 0 ? trimmed : null,
+      };
+    });
+  };
+
   return (
     <SessionContext.Provider
       value={{
@@ -189,6 +205,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
         undoLastDrink,
         endSession,
         clearHistory,
+        setSessionNote,
       }}
     >
       {children}

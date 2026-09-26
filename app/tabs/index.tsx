@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Drink, DrinkType, useSession } from "../../context/SessionContext";
 
@@ -18,6 +25,7 @@ export default function TonightScreen() {
     endSession,
     commitPendingSession,
     undoEndSession,
+    setSessionNote,
     isLoaded,
   } = useSession();
 
@@ -115,6 +123,18 @@ export default function TonightScreen() {
               <Text style={styles.heroCount}>{drinkCount}</Text>
               <Text style={styles.heroMeta}>{sessionMeta}</Text>
             </View>
+
+            {drinkCount > 0 && (
+              <TextInput
+                value={currentSession?.note ?? ""}
+                onChangeText={setSessionNote}
+                placeholder="Add a note (e.g. location)"
+                placeholderTextColor="#6b7280"
+                maxLength={60}
+                style={styles.noteInput}
+                accessibilityLabel="Session note"
+              />
+            )}
 
             <View style={styles.buttonRow}>
               {DRINK_OPTIONS.map((option) => (
@@ -283,6 +303,15 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 15,
     color: "#d1d5db",
+  },
+  noteInput: {
+    backgroundColor: "#1A1A1A",
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 16,
+    color: "#f9fafb",
+    fontSize: 15,
   },
   buttonRow: {
     flexDirection: "row",
